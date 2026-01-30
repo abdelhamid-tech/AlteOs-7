@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>AlteOS - Lock Screen</title>
+
+<!-- Google Font: Google Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  height: 100vh;
+  width: 100vw;
+  background: url('image/wallpaper.jpg') no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Google Sans', sans-serif;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0,0,0,0.7);
+}
+
+/* Conteneur central */
+.lock-container {
+  text-align: center;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.3);
+  padding: 40px 60px;
+  border-radius: 20px;
+}
+
+/* Heure et date */
+.time {
+  font-size: 72px;
+  font-weight: 500;
+}
+.date {
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+/* Météo */
+.weather {
+  margin-top: 20px;
+  font-size: 20px;
+}
+.weather span {
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<div class="lock-container">
+  <div class="time" id="time">00:00</div>
+  <div class="date" id="date">Jour, 1 Janvier 2026</div>
+  <div class="weather" id="weather">Chargement météo...</div>
+</div>
+
+<script>
+// ---------------------------
+// Heure et Date dynamique
+// ---------------------------
+function updateTimeDate() {
+    const now = new Date();
+    const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    document.getElementById('time').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    document.getElementById('date').textContent = now.toLocaleDateString('fr-FR', optionsDate);
+}
+setInterval(updateTimeDate, 1000);
+updateTimeDate();
+
+// ---------------------------
+// Météo via wttr.in (pas de clé API)
+// ---------------------------
+const weatherEl = document.getElementById('weather');
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        // wttr.in JSON endpoint
+        const url = `https://wttr.in/${lat},${lon}?format=j1`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const current = data.current_condition[0];
+                const temp = current.temp_C;
+                const desc = current.weatherDesc[0].value;
+                weatherEl.innerHTML = `<span>Météo:</span> ${temp}°C, ${desc}`;
+            })
+            .catch(() => {
+                weatherEl.textContent = 'Impossible de récupérer la météo';
+            });
+    }, () => {
+        weatherEl.textContent = 'Localisation refusée';
+    });
+} else {
+    weatherEl.textContent = 'Geolocation non supportée';
+}
+</script>
+
+</body>
+</html>
