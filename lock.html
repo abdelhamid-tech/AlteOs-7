@@ -4,64 +4,47 @@
 <meta charset="UTF-8">
 <title>AlteOS - Lock Screen</title>
 
-<!-- Google Font -->
+<!-- Google Sans -->
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-/* Reset & base */
-* { margin:0; padding:0; box-sizing:border-box; }
-body { 
-  height:100vh; width:100vw; font-family:'Google Sans', sans-serif; color:#fff; overflow:hidden;
-  display:flex; justify-content:center; align-items:center; background:#000; position:relative; 
-  transition: background 1s; text-shadow:0 0 10px rgba(0,0,0,0.7);
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  height:100vh;width:100vw;font-family:'Google Sans',sans-serif;color:#fff;
+  overflow:hidden;display:flex;justify-content:center;align-items:center;position:relative;
+  transition: background 1s;text-shadow:0 0 10px rgba(0,0,0,0.7);
 }
-
-/* Slideshow fond */
-.background-slideshow {
-  position:absolute; top:0; left:0; width:100%; height:100%; z-index:-2;
-  background-size:cover; background-position:center; transition: background-image 1s ease-in-out;
+.background-slideshow{
+  position:absolute;top:0;left:0;width:100%;height:100%;z-index:-2;
+  background-size:cover;background-position:center;transition: background-image 1s ease-in-out;
 }
-
-/* Particules */
-canvas#particles { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1; }
-
-/* Bloc central */
-.lock-container {
-  text-align:center;
-  backdrop-filter: blur(8px);
-  background: rgba(0,0,0,0.3);
-  padding: 40px 60px;
-  border-radius: 20px;
-  opacity:0;
-  transform:scale(0.95);
-  animation: fadeInScale 1s forwards;
-  transition: backdrop-filter 1s;
+canvas#particles{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;}
+.lock-container{
+  text-align:center;backdrop-filter: blur(8px);background: rgba(0,0,0,0.3);
+  padding:40px 60px;border-radius:20px;opacity:0;transform:scale(0.95);
+  animation: fadeInScale 1s forwards;transition: backdrop-filter 1s;
 }
-
-/* Animation fade-in + scale */
-@keyframes fadeInScale {
-  to { opacity:1; transform:scale(1); }
+@keyframes fadeInScale{to{opacity:1;transform:scale(1);}}
+.time{font-size:72px;font-weight:500;}
+.date{font-size:24px;margin-top:10px;}
+.greeting{font-size:28px;margin-bottom:20px;font-weight:500;}
+.weather{margin-top:20px;font-size:20px;}
+.weather img{width:30px;vertical-align:middle;margin-right:5px;}
+.status-bar{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  display:flex;gap:30px;font-size:16px;opacity:0.8;align-items:center;
 }
-
-/* Heure et date */
-.time { font-size:72px; font-weight:500; }
-.date { font-size:24px; margin-top:10px; }
-
-/* Message de bienvenue */
-.greeting { font-size:28px; margin-bottom:20px; font-weight:500; }
-
-/* Météo */
-.weather { margin-top:20px; font-size:20px; }
-.weather span { font-weight:500; }
-
-/* Barre de statut fictive */
-.status-bar { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
-  display:flex; gap:20px; font-size:16px; opacity:0.7; }
+.status-bar img{width:20px;height:20px;margin-right:5px;}
+.unlock-btn{
+  margin-top:20px;padding:10px 30px;border:none;border-radius:12px;
+  background:rgba(0,200,255,0.8);color:#fff;font-size:18px;cursor:pointer;
+  transition: background 0.3s;
+}
+.unlock-btn:hover{background:rgba(0,200,255,1);}
 </style>
 </head>
 <body>
 
-<!-- Fond dynamique -->
 <div class="background-slideshow" id="bg"></div>
 <canvas id="particles"></canvas>
 
@@ -70,104 +53,111 @@ canvas#particles { position:absolute; top:0; left:0; width:100%; height:100%; z-
   <div class="time" id="time">00:00</div>
   <div class="date" id="date">Jour, 1 Janvier 2026</div>
   <div class="weather" id="weather">Chargement météo...</div>
+  <button class="unlock-btn" id="unlockBtn">Déverrouiller</button>
 </div>
 
 <div class="status-bar">
-  <div>Wi-Fi: 🌐</div>
-  <div>Batterie: 🔋 87%</div>
+  <div id="wifi"><img src="image/wifi.png">Réseau</div>
+  <div id="battery"><img src="image/battery.png">--%</div>
+  <div id="timezone">Fuseau</div>
 </div>
 
 <script>
 // ---------------------------
-// Heure et Date dynamique
-// ---------------------------
-function updateTimeDate() {
-    const now = new Date();
-    const hours = now.getHours();
-    const optionsDate = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
-    document.getElementById('time').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    document.getElementById('date').textContent = now.toLocaleDateString('fr-FR', optionsDate);
-    
-    // Message de bienvenue
-    let greetingText = hours < 12 ? "Bonjour" : hours < 18 ? "Bonne après-midi" : "Bonsoir";
-    document.getElementById('greeting').textContent = greetingText;
+// Heure et date + message
+function updateTimeDate(){
+  const now = new Date();
+  const hours = now.getHours();
+  document.getElementById('time').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('date').textContent = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const greet = hours<12?"Bonjour":hours<18?"Bonne après-midi":"Bonsoir";
+  document.getElementById('greeting').textContent=greet;
 }
 setInterval(updateTimeDate,1000);
 updateTimeDate();
 
 // ---------------------------
-// Fond dynamique (slideshow)
-const images = ['image/wallpaper.jpg','image/wallpaper2.jpg','image/wallpaper3.jpg']; 
-let bgIndex = 0;
-const bgEl = document.getElementById('bg');
-function changeBg(){
-  bgIndex = (bgIndex+1)%images.length;
-  bgEl.style.backgroundImage = `url('${images[bgIndex]}')`;
-}
-bgEl.style.backgroundImage = `url('${images[0]}')`;
-setInterval(changeBg,10000);
-
-// ---------------------------
-// Particules simples
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let particlesArray = [];
-class Particle {
-  constructor(){
-    this.x=Math.random()*canvas.width;
-    this.y=Math.random()*canvas.height;
-    this.size=Math.random()*3+1;
-    this.speedX=Math.random()*0.5-0.25;
-    this.speedY=Math.random()*0.5-0.25;
-  }
-  update(){ this.x+=this.speedX; this.y+=this.speedY; 
-    if(this.x>canvas.width)this.x=0; if(this.x<0)this.x=canvas.width;
-    if(this.y>canvas.height)this.y=0; if(this.y<0)this.y=canvas.height;
-  }
-  draw(){ ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); }
-}
-for(let i=0;i<100;i++){ particlesArray.push(new Particle()); }
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particlesArray.forEach(p=>{p.update();p.draw();});
-  requestAnimationFrame(animate);
-}
-animate();
-
-// ---------------------------
-// Météo via wttr.in
-const weatherEl = document.getElementById('weather');
+// Météo réelle via wttr.in
+const weatherEl=document.getElementById('weather');
 if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(pos=>{
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
+    const lat=pos.coords.latitude;
+    const lon=pos.coords.longitude;
     fetch(`https://wttr.in/${lat},${lon}?format=j1`)
       .then(res=>res.json())
       .then(data=>{
-        const current = data.current_condition[0];
-        const temp = current.temp_C;
-        const desc = current.weatherDesc[0].value;
-        const icon = current.weatherIconUrl[0].value;
-        weatherEl.innerHTML = `<img src="${icon}" style="width:30px;vertical-align:middle;margin-right:5px;"> <span>Météo:</span> ${temp}°C, ${desc}`;
+        const cur=data.current_condition[0];
+        const temp=cur.temp_C;
+        const desc=cur.weatherDesc[0].value;
+        const icon=cur.weatherIconUrl[0].value;
+        weatherEl.innerHTML=`<img src="${icon}"><span>Météo:</span> ${temp}°C, ${desc}`;
       })
       .catch(()=>weatherEl.textContent='Impossible de récupérer la météo');
   },()=>weatherEl.textContent='Localisation refusée');
-}else{weatherEl.textContent='Geolocation non supportée';}
+}else weatherEl.textContent='Geolocation non supportée';
 
 // ---------------------------
-// Détection thème jour/nuit
-function updateTheme(){
-  const hour = new Date().getHours();
-  if(hour>=7 && hour<19){
-    document.body.style.background="#111"; // jour
-  } else{
-    document.body.style.background="#000"; // nuit
+// Fond dynamique
+const images=['image/wallpaper.jpg','image/wallpaper2.jpg','image/wallpaper3.jpg'];
+let bgIndex=0;
+const bgEl=document.getElementById('bg');
+bgEl.style.backgroundImage=`url('${images[0]}')`;
+setInterval(()=>{ bgIndex=(bgIndex+1)%images.length; bgEl.style.backgroundImage=`url('${images[bgIndex]}')`; },10000);
+
+// ---------------------------
+// Particules réactives
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+let particles=[];
+class Particle{
+  constructor(){
+    this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height;
+    this.size=Math.random()*3+1; this.speedX=Math.random()*0.5-0.25; this.speedY=Math.random()*0.5-0.25;
   }
+  update(){ this.x+=this.speedX; this.y+=this.speedY;
+    if(this.x>canvas.width)this.x=0;if(this.x<0)this.x=canvas.width;
+    if(this.y>canvas.height)this.y=0;if(this.y<0)this.y=canvas.height;
+  }
+  draw(){ ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();}
+}
+for(let i=0;i<100;i++)particles.push(new Particle());
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate);}
+animate();
+canvas.addEventListener('mousemove',e=>{particles.forEach(p=>{p.speedX+=(p.x-e.clientX)*0.0001;p.speedY+=(p.y-e.clientY)*0.0001;});});
+
+// ---------------------------
+// Détecter thème jour/nuit
+function updateTheme(){
+  const hour=new Date().getHours();
+  document.body.style.background=hour>=7 && hour<19?"#111":"#000";
 }
 setInterval(updateTheme,60000);
 updateTheme();
+
+// ---------------------------
+// Fuseau horaire réel
+document.getElementById('timezone').textContent=Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// ---------------------------
+// Statut réseau réel
+function updateNetwork(){document.getElementById('wifi').textContent=(navigator.onLine?"En ligne":"Hors ligne");}
+window.addEventListener('online',updateNetwork); window.addEventListener('offline',updateNetwork);
+updateNetwork();
+
+// ---------------------------
+// Batterie réelle
+navigator.getBattery().then(batt=>{
+  function updateBatt(){document.getElementById('battery').textContent=Math.round(batt.level*100)+'%';}
+  batt.addEventListener('levelchange',updateBatt); updateBatt();
+});
+
+// ---------------------------
+// Déverrouillage réel
+document.getElementById('unlockBtn').addEventListener('click',()=>{
+  document.getElementById('lock').style.opacity=0;
+  setTimeout(()=>{ window.location.href='desktop.html'; },1000);
+});
 </script>
 
 </body>
