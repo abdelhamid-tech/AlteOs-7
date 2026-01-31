@@ -125,16 +125,7 @@ for(let i=0;i<100;i++)particles.push(new Particle());
 function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate);}
 animate();
 canvas.addEventListener('mousemove',e=>{particles.forEach(p=>{p.speedX+=(p.x-e.clientX)*0.0001;p.speedY+=(p.y-e.clientY)*0.0001;});});
-
-// ---------------------------
-// Détecter thème jour/nuit
-function updateTheme(){
-  const hour=new Date().getHours();
-  document.body.style.background=hour>=7 && hour<19?"#111":"#000";
-}
-setInterval(updateTheme,60000);
-updateTheme();
-
+  
 // ---------------------------
 // Fuseau horaire réel
 document.getElementById('timezone').textContent=Intl.DateTimeFormat().resolvedOptions().timeZone;
