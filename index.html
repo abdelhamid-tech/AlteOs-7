@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>AlteOS</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+}
+
+.boot {
+  width: 100%;
+  text-align: center;
+}
+
+.logo {
+  width: 90px;
+  margin-bottom: 60px;
+}
+
+.loader {
+  width: 100%;
+  height: 3px;
+  background: #111;
+  overflow: hidden;
+}
+
+.loader span {
+  display: block;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ffffff,
+    transparent
+  );
+  animation: loading 1.8s infinite ease-in-out;
+}
+
+@keyframes loading {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="boot">
+  <img src="image/logo.jpg" class="logo" alt="AlteOS">
+  <div class="loader">
+    <span></span>
+  </div>
+</div>
+
+<script>
+setTimeout(() => {
+  window.location.href = "lock.html";
+}, 4000);
+</script>
+
+</body>
+</html>
