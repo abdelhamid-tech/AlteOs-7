@@ -4,63 +4,77 @@
 <meta charset="UTF-8">
 <title>AlteOS - Lock Screen</title>
 
-<!-- Google Font: Google Sans -->
+<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  height: 100vh;
-  width: 100vw;
-  background: url('image/wallpaper.jpg') no-repeat center center/cover;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Google Sans', sans-serif;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(0,0,0,0.7);
+/* Reset & base */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { 
+  height:100vh; width:100vw; font-family:'Google Sans', sans-serif; color:#fff; overflow:hidden;
+  display:flex; justify-content:center; align-items:center; background:#000; position:relative; 
+  transition: background 1s; text-shadow:0 0 10px rgba(0,0,0,0.7);
 }
 
-/* Conteneur central */
+/* Slideshow fond */
+.background-slideshow {
+  position:absolute; top:0; left:0; width:100%; height:100%; z-index:-2;
+  background-size:cover; background-position:center; transition: background-image 1s ease-in-out;
+}
+
+/* Particules */
+canvas#particles { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1; }
+
+/* Bloc central */
 .lock-container {
-  text-align: center;
+  text-align:center;
   backdrop-filter: blur(8px);
   background: rgba(0,0,0,0.3);
   padding: 40px 60px;
   border-radius: 20px;
+  opacity:0;
+  transform:scale(0.95);
+  animation: fadeInScale 1s forwards;
+  transition: backdrop-filter 1s;
+}
+
+/* Animation fade-in + scale */
+@keyframes fadeInScale {
+  to { opacity:1; transform:scale(1); }
 }
 
 /* Heure et date */
-.time {
-  font-size: 72px;
-  font-weight: 500;
-}
-.date {
-  font-size: 24px;
-  margin-top: 10px;
-}
+.time { font-size:72px; font-weight:500; }
+.date { font-size:24px; margin-top:10px; }
+
+/* Message de bienvenue */
+.greeting { font-size:28px; margin-bottom:20px; font-weight:500; }
 
 /* Météo */
-.weather {
-  margin-top: 20px;
-  font-size: 20px;
-}
-.weather span {
-  font-weight: 500;
-}
+.weather { margin-top:20px; font-size:20px; }
+.weather span { font-weight:500; }
+
+/* Barre de statut fictive */
+.status-bar { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+  display:flex; gap:20px; font-size:16px; opacity:0.7; }
 </style>
 </head>
 <body>
 
-<div class="lock-container">
+<!-- Fond dynamique -->
+<div class="background-slideshow" id="bg"></div>
+<canvas id="particles"></canvas>
+
+<div class="lock-container" id="lock">
+  <div class="greeting" id="greeting">Bonjour</div>
   <div class="time" id="time">00:00</div>
   <div class="date" id="date">Jour, 1 Janvier 2026</div>
-  <div class="weather" id="weather">Chargement de la météo...</div>
+  <div class="weather" id="weather">Chargement météo...</div>
+</div>
+
+<div class="status-bar">
+  <div>Wi-Fi: 🌐</div>
+  <div>Batterie: 🔋 87%</div>
 </div>
 
 <script>
@@ -69,43 +83,91 @@ body {
 // ---------------------------
 function updateTimeDate() {
     const now = new Date();
-    const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    const hours = now.getHours();
+    const optionsDate = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
     document.getElementById('time').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     document.getElementById('date').textContent = now.toLocaleDateString('fr-FR', optionsDate);
+    
+    // Message de bienvenue
+    let greetingText = hours < 12 ? "Bonjour" : hours < 18 ? "Bonne après-midi" : "Bonsoir";
+    document.getElementById('greeting').textContent = greetingText;
 }
-setInterval(updateTimeDate, 1000);
+setInterval(updateTimeDate,1000);
 updateTimeDate();
 
 // ---------------------------
-// Météo via wttr.in (pas de clé API)
-// ---------------------------
-const weatherEl = document.getElementById('weather');
-
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(position => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-
-        // wttr.in JSON endpoint
-        const url = `https://wttr.in/${lat},${lon}?format=j1`;
-
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                const current = data.current_condition[0];
-                const temp = current.temp_C;
-                const desc = current.weatherDesc[0].value;
-                weatherEl.innerHTML = `<span>Météo:</span> ${temp}°C, ${desc}`;
-            })
-            .catch(() => {
-                weatherEl.textContent = 'Impossible de récupérer la météo';
-            });
-    }, () => {
-        weatherEl.textContent = 'Localisation refusée';
-    });
-} else {
-    weatherEl.textContent = 'Geolocation non supportée';
+// Fond dynamique (slideshow)
+const images = ['image/wallpaper.jpg','image/wallpaper2.jpg','image/wallpaper3.jpg']; 
+let bgIndex = 0;
+const bgEl = document.getElementById('bg');
+function changeBg(){
+  bgIndex = (bgIndex+1)%images.length;
+  bgEl.style.backgroundImage = `url('${images[bgIndex]}')`;
 }
+bgEl.style.backgroundImage = `url('${images[0]}')`;
+setInterval(changeBg,10000);
+
+// ---------------------------
+// Particules simples
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let particlesArray = [];
+class Particle {
+  constructor(){
+    this.x=Math.random()*canvas.width;
+    this.y=Math.random()*canvas.height;
+    this.size=Math.random()*3+1;
+    this.speedX=Math.random()*0.5-0.25;
+    this.speedY=Math.random()*0.5-0.25;
+  }
+  update(){ this.x+=this.speedX; this.y+=this.speedY; 
+    if(this.x>canvas.width)this.x=0; if(this.x<0)this.x=canvas.width;
+    if(this.y>canvas.height)this.y=0; if(this.y<0)this.y=canvas.height;
+  }
+  draw(){ ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); }
+}
+for(let i=0;i<100;i++){ particlesArray.push(new Particle()); }
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particlesArray.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ---------------------------
+// Météo via wttr.in
+const weatherEl = document.getElementById('weather');
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    fetch(`https://wttr.in/${lat},${lon}?format=j1`)
+      .then(res=>res.json())
+      .then(data=>{
+        const current = data.current_condition[0];
+        const temp = current.temp_C;
+        const desc = current.weatherDesc[0].value;
+        const icon = current.weatherIconUrl[0].value;
+        weatherEl.innerHTML = `<img src="${icon}" style="width:30px;vertical-align:middle;margin-right:5px;"> <span>Météo:</span> ${temp}°C, ${desc}`;
+      })
+      .catch(()=>weatherEl.textContent='Impossible de récupérer la météo');
+  },()=>weatherEl.textContent='Localisation refusée');
+}else{weatherEl.textContent='Geolocation non supportée';}
+
+// ---------------------------
+// Détection thème jour/nuit
+function updateTheme(){
+  const hour = new Date().getHours();
+  if(hour>=7 && hour<19){
+    document.body.style.background="#111"; // jour
+  } else{
+    document.body.style.background="#000"; // nuit
+  }
+}
+setInterval(updateTheme,60000);
+updateTheme();
 </script>
 
 </body>
