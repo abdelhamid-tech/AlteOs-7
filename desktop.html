@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlteOS Desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  font-family:'Inter',sans-serif;
+  background:url('wallpaper.jpg') center/cover no-repeat fixed;
+  overflow:hidden;
+}
+
+/* TASKBAR */
+.taskbar{
+  position:fixed;
+  bottom:16px;
+  left:50%;
+  transform:translateX(-50%);
+  height:56px;
+  display:flex;
+  gap:10px;
+}
+
+.block{
+  height:100%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:0 16px;
+  background:rgba(255,255,255,0.30);
+  backdrop-filter:blur(26px) saturate(1.4);
+  border-radius:8px;
+  box-shadow:0 6px 22px rgba(0,0,0,.22);
+  color:#111;
+  font-size:13px;
+}
+
+/* WEATHER BLOCK */
+.weather{
+  min-width:220px;
+  justify-content:flex-start;
+  font-weight:500;
+}
+
+/* APPS + START */
+.apps{
+  gap:10px;
+}
+
+.start{
+  width:36px;
+  height:36px;
+  border-radius:6px;
+  background:rgba(0,0,0,.15);
+  display:grid;
+  place-items:center;
+}
+.start::before{
+  content:"";
+  width:14px;
+  height:14px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:2px;
+}
+.start::before div{background:#111;}
+
+.app{
+  width:34px;
+  height:34px;
+  border-radius:6px;
+  background:rgba(0,0,0,.12);
+}
+
+/* SYSTEM BLOCK */
+.system{
+  gap:10px;
+}
+
+.icon{
+  position:relative;
+}
+
+.battery{
+  width:22px;
+  height:10px;
+  border:2px solid #111;
+}
+.battery::after{
+  content:"";
+  position:absolute;
+  right:-4px;
+  top:2px;
+  width:3px;
+  height:6px;
+  background:#111;
+}
+.battery-level{
+  height:100%;
+  background:#111;
+}
+
+.wifi{
+  width:14px;
+  height:14px;
+  border:2px solid #111;
+  border-radius:50%;
+}
+
+.sound{
+  width:14px;
+  height:14px;
+  border-left:4px solid #111;
+}
+
+/* DATE USER */
+.datetime{
+  gap:14px;
+}
+
+.user{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#666,#aaa);
+}
+</style>
+</head>
+<body>
+
+<div class="taskbar">
+
+  <!-- WEATHER -->
+  <div class="block weather">
+    <span id="temp">--°</span>
+    <span id="city">Localisation</span>
+  </div>
+
+  <!-- APPS + START -->
+  <div class="block apps">
+    <div class="start"></div>
+    <div class="app"></div>
+    <div class="app"></div>
+    <div class="app"></div>
+  </div>
+
+  <!-- SYSTEM -->
+  <div class="block system">
+    <div class="icon wifi" id="wifi"></div>
+    <div class="icon sound"></div>
+    <div class="icon battery"><div class="battery-level" id="bat"></div></div>
+  </div>
+
+  <!-- DATE + USER -->
+  <div class="block datetime">
+    <div>
+      <div id="time"></div>
+      <div id="date" style="font-size:11px"></div>
+    </div>
+    <div class="user"></div>
+  </div>
+
+</div>
+
+<script>
+/* TIME */
+function updateTime(){
+  const d=new Date();
+  time.textContent=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  date.textContent=d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'short'});
+}
+updateTime();
+setInterval(updateTime,1000);
+
+/* BATTERY */
+navigator.getBattery().then(b=>{
+  function u(){ bat.style.width=(b.level*100)+'%'; }
+  u();
+  b.addEventListener('levelchange',u);
+});
+
+/* WIFI */
+function net(){ wifi.style.opacity=navigator.onLine?1:.3; }
+net();
+addEventListener('online',net);
+addEventListener('offline',net);
+
+/* WEATHER (NO API KEY) */
+navigator.geolocation.getCurrentPosition(pos=>{
+  fetch(`https://wttr.in/${pos.coords.latitude},${pos.coords.longitude}?format=%t+%C`).then(r=>r.text()).then(t=>{
+    const parts=t.split(' ');
+    temp.textContent=parts[0];
+    city.textContent=parts.slice(1).join(' ');
+  });
+});
+</script>
+
+</body>
+</html>
