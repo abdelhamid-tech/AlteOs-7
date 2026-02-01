@@ -2,203 +2,203 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AlteOS Desktop</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>AlteOS Taskbar</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-html,body{
-  margin:0;
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Google Sans',sans-serif;}
+html,body{width:100%;height:100%;overflow:hidden;}
+
+body{
+  background:url("image/wallpaper.jpg") center/cover no-repeat fixed;
+}
+
+/* BARRE DE TÂCHE */
+#taskbar{
+  position:absolute;
+  bottom:0;
+  left:0;
   width:100%;
-  height:100%;
-  font-family:'Inter',sans-serif;
-  background:url('image/wallpaper.jpg') center/cover no-repeat fixed;
-  overflow:hidden;
-}
-
-/* TASKBAR */
-.taskbar{
-  position:fixed;
-  bottom:16px;
-  left:50%;
-  transform:translateX(-50%);
-  height:56px;
-  display:flex;
-  gap:10px;
-}
-
-.block{
-  height:100%;
+  height:70px;
   display:flex;
   align-items:center;
-  gap:12px;
+  justify-content:space-between;
+  padding:0 14px;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter:blur(20px);
+}
+
+/* BLOCS */
+.block{
+  height:48px;
+  display:flex;
+  align-items:center;
   padding:0 16px;
-  background:rgba(255,255,255,0.30);
-  backdrop-filter:blur(26px) saturate(1.4);
-  border-radius:8px;
-  box-shadow:0 6px 22px rgba(0,0,0,.22);
-  color:#111;
-  font-size:13px;
-}
-
-/* WEATHER BLOCK */
-.weather{
-  min-width:220px;
-  justify-content:flex-start;
-  font-weight:500;
-}
-
-/* APPS + START */
-.apps{
-  gap:10px;
-}
-
-.start{
-  width:36px;
-  height:36px;
   border-radius:6px;
-  background:rgba(0,0,0,.15);
-  display:grid;
-  place-items:center;
-}
-.start::before{
-  content:"";
-  width:14px;
-  height:14px;
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  grid-template-rows:repeat(2,1fr);
-  gap:2px;
-}
-.start::before div{background:#111;}
-
-.app{
-  width:34px;
-  height:34px;
-  border-radius:6px;
-  background:rgba(0,0,0,.12);
-}
-
-/* SYSTEM BLOCK */
-.system{
-  gap:10px;
-}
-
-.icon{
-  position:relative;
-}
-
-.battery{
-  width:22px;
-  height:10px;
-  border:2px solid #111;
-}
-.battery::after{
-  content:"";
-  position:absolute;
-  right:-4px;
-  top:2px;
-  width:3px;
-  height:6px;
-  background:#111;
-}
-.battery-level{
-  height:100%;
-  background:#111;
-}
-
-.wifi{
-  width:14px;
-  height:14px;
-  border:2px solid #111;
-  border-radius:50%;
-}
-
-.sound{
-  width:14px;
-  height:14px;
-  border-left:4px solid #111;
-}
-
-/* DATE USER */
-.datetime{
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
   gap:14px;
 }
 
-.user{
-  width:30px;
-  height:30px;
+/* BLOC METEO */
+#weather-block{
+  width:260px;
+  background-size:cover;
+  background-position:center;
+  color:white;
+  font-size:15px;
+  display:flex;
+  justify-content:space-between;
+}
+
+/* BLOC APPLIS */
+#apps-block{
+  display:flex;
+  gap:10px;
+}
+.app-icon{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  cursor:pointer;
+  transition:.2s;
+}
+.app-icon:hover{
+  background:rgba(255,255,255,0.18);
+}
+.app-icon svg{
+  width:22px;height:22px;
+  stroke:white;
+  stroke-width:1.6;
+  fill:none;
+}
+
+/* BLOC SYSTEME */
+#system-block svg{
+  width:22px;height:22px;
+  stroke:white;
+  stroke-width:1.6;
+  fill:none;
+}
+
+/* BLOC DATE + HEURE + USER */
+#datetime-block{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  font-size:15px;
+}
+#user-icon{
+  width:36px;height:36px;
   border-radius:50%;
-  background:linear-gradient(135deg,#666,#aaa);
+  background:white;
 }
 </style>
 </head>
+
 <body>
 
-<div class="taskbar">
+<!-- BARRE DE TÂCHE -->
+<div id="taskbar">
 
-  <!-- WEATHER -->
-  <div class="block weather">
-    <span id="temp">--°</span>
-    <span id="city">Localisation</span>
+  <!-- BLOC 1 : METEO -->
+  <div id="weather-block" class="block">
+    <span id="weather-temp">28° Sunny</span>
+    <span id="weather-city">Denpasar</span>
   </div>
 
-  <!-- APPS + START -->
-  <div class="block apps">
-    <div class="start"></div>
-    <div class="app"></div>
-    <div class="app"></div>
-    <div class="app"></div>
-  </div>
+  <!-- BLOC 2 : APPLIS -->
+  <div id="apps-block" class="block">
 
-  <!-- SYSTEM -->
-  <div class="block system">
-    <div class="icon wifi" id="wifi"></div>
-    <div class="icon sound"></div>
-    <div class="icon battery"><div class="battery-level" id="bat"></div></div>
-  </div>
-
-  <!-- DATE + USER -->
-  <div class="block datetime">
-    <div>
-      <div id="time"></div>
-      <div id="date" style="font-size:11px"></div>
+    <!-- START -->
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="3" width="8" height="8" rx="1"/>
+        <rect x="13" y="3" width="8" height="8" rx="1"/>
+        <rect x="3" y="13" width="8" height="8" rx="1"/>
+        <rect x="13" y="13" width="8" height="8" rx="1"/>
+      </svg>
     </div>
-    <div class="user"></div>
+
+    <!-- SEARCH -->
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="16" y1="16" x2="22" y2="22"/>
+      </svg>
+    </div>
+
+    <!-- TASK VIEW -->
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="14" rx="2"/>
+        <line x1="9" y1="4" x2="9" y2="18"/>
+      </svg>
+    </div>
+
+    <!-- EXPLORER -->
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="6" width="18" height="12" rx="3"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- BLOC 3 : SYSTEME -->
+  <div id="system-block" class="block">
+    <!-- WIFI -->
+    <svg viewBox="0 0 24 24">
+      <path d="M2 8a16 16 0 0 1 20 0"/>
+      <path d="M5 12a10 10 0 0 1 14 0"/>
+      <path d="M8.5 16a5 5 0 0 1 7 0"/>
+      <circle cx="12" cy="20" r="1"/>
+    </svg>
+
+    <!-- BLUETOOTH -->
+    <svg viewBox="0 0 24 24">
+      <path d="M12 3v18l7-7-7-7 7-7z"/>
+      <line x1="5" y1="7" x2="12" y2="12"/>
+      <line x1="5" y1="17" x2="12" y2="12"/>
+    </svg>
+
+    <!-- SON -->
+    <svg viewBox="0 0 24 24">
+      <polygon points="5 9 9 9 13 5 13 19 9 15 5 15"/>
+      <path d="M16 9a4 4 0 0 1 0 6"/>
+    </svg>
+
+    <!-- BATTERIE -->
+    <svg viewBox="0 0 24 24">
+      <rect x="2" y="7" width="18" height="10" rx="2"/>
+      <rect x="20" y="10" width="2" height="4"/>
+    </svg>
+  </div>
+
+  <!-- BLOC 4 : DATE + HEURE + USER -->
+  <div id="datetime-block" class="block">
+    <span id="date-text">Aug 14th</span>
+    <span id="time-text">12:00</span>
+    <div id="user-icon"></div>
   </div>
 
 </div>
 
 <script>
-/* TIME */
+// HEURE
 function updateTime(){
-  const d=new Date();
-  time.textContent=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  date.textContent=d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'short'});
+  const now=new Date();
+  document.getElementById("time-text").textContent =
+    now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 }
-updateTime();
 setInterval(updateTime,1000);
+updateTime();
 
-/* BATTERY */
-navigator.getBattery().then(b=>{
-  function u(){ bat.style.width=(b.level*100)+'%'; }
-  u();
-  b.addEventListener('levelchange',u);
-});
-
-/* WIFI */
-function net(){ wifi.style.opacity=navigator.onLine?1:.3; }
-net();
-addEventListener('online',net);
-addEventListener('offline',net);
-
-/* WEATHER (NO API KEY) */
-navigator.geolocation.getCurrentPosition(pos=>{
-  fetch(`https://wttr.in/${pos.coords.latitude},${pos.coords.longitude}?format=%t+%C`).then(r=>r.text()).then(t=>{
-    const parts=t.split(' ');
-    temp.textContent=parts[0];
-    city.textContent=parts.slice(1).join(' ');
-  });
-});
+// METEO (exemple simple)
+document.getElementById("weather-block").style.backgroundImage =
+  "url('https://images.unsplash.com/photo-1501973801540-537f08ccae7b?auto=format&fit=crop&w=800&q=60')";
 </script>
 
 </body>
