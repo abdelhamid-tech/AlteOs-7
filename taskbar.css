@@ -1,0 +1,86 @@
+body {
+  background: transparent;
+}
+
+.taskbar {
+  height: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* blocs */
+.block {
+  height: 100%;
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(20px);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+}
+
+/* météo */
+.weather {
+  min-width: 180px;
+}
+.sun {
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #ffd400, #ff9900);
+  border-radius: 50%;
+}
+
+/* apps */
+.apps .icon {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg,#5da9ff,#1f6fff);
+  border-radius: 4px;
+}
+.start {
+  background: linear-gradient(135deg,#7f7fff,#c08cff);
+}
+
+/* statut */
+.status {
+  gap: 12px;
+}
+.wifi {
+  width: 18px;
+  height: 12px;
+  border-bottom: 3px solid #fff;
+  border-radius: 0 0 10px 10px;
+}
+.battery {
+  width: 24px;
+  height: 12px;
+  border: 2px solid #fff;
+  position: relative;
+}
+.battery::after {
+  content:"";
+  position:absolute;
+  right:-4px;
+  top:3px;
+  width:3px;
+  height:6px;
+  background:#fff;
+}
+.level {
+  height:100%;
+  background:#6bff9f;
+  width:50%;
+}
+
+/* time */
+.time-user span {
+  font-size: 14px;
+}
+.user {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#ff7adf,#9b6bff);
+}
