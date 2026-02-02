@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="taskbar.css">
+</head>
+<body>
+
+<div class="taskbar">
+
+  <!-- MÉTÉO -->
+  <div class="block weather" id="weather">
+    <div class="sun"></div>
+    <span id="temp">--°C</span>
+    <span id="cond">Loading</span>
+  </div>
+
+  <!-- APPS -->
+  <div class="block apps">
+    <div class="icon start"></div>
+    <div class="icon"></div>
+    <div class="icon"></div>
+    <div class="icon"></div>
+  </div>
+
+  <!-- STATUT -->
+  <div class="block status">
+    <div class="wifi"></div>
+    <div class="battery"><div class="level" id="bat"></div></div>
+    <div class="sound"></div>
+  </div>
+
+  <!-- DATE / USER -->
+  <div class="block time-user">
+    <span id="time"></span>
+    <div class="user"></div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
