@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AlteOs 7 – Boot</title>
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            overflow: hidden;
+        }
+
+        #introVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
+
+        #skip {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: sans-serif;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ta vidéo -->
+    <video id="introVideo" autoplay>
+        <source src="ta_video.mp4" type="video/mp4">
+    </video>
+
+    <!-- Bouton Skip (optionnel) -->
+    <div id="skip">Passer</div>
+
+    <script>
+        const video = document.getElementById("introVideo");
+        const skip = document.getElementById("skip");
+
+        // Quand la vidéo se termine → aller au bureau
+        video.addEventListener("ended", () => {
+            window.location.href = "desktop.html"; // change si ton bureau a un autre nom
+        });
+
+        // Si l’utilisateur clique sur "Passer"
+        skip.addEventListener("click", () => {
+            window.location.href = "desktop.html";
+        });
+    </script>
+
+</body>
+</html>
