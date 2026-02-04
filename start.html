@@ -18,44 +18,28 @@
             height: 100vh;
             object-fit: cover;
         }
-
-        #skip {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: sans-serif;
-            backdrop-filter: blur(5px);
-        }
     </style>
 </head>
 <body>
 
-    <!-- Ta vidéo -->
-    <video id="introVideo" autoplay>
+    <video id="introVideo" autoplay muted playsinline>
         <source src="startvideo.mp4" type="video/mp4">
     </video>
 
-    <!-- Bouton Skip (optionnel) -->
-    <div id="skip">Passer</div>
-
     <script>
         const video = document.getElementById("introVideo");
-        const skip = document.getElementById("skip");
+
+        // Certains navigateurs bloquent l'autoplay → on force la lecture
+        video.addEventListener("canplay", () => {
+            video.play().catch(() => {
+                // Si ça bloque encore, on réessaie après 300ms
+                setTimeout(() => video.play(), 300);
+            });
+        });
 
         // Quand la vidéo se termine → aller au bureau
         video.addEventListener("ended", () => {
             window.location.href = "desktop.html"; // change si ton bureau a un autre nom
-        });
-
-        // Si l’utilisateur clique sur "Passer"
-        skip.addEventListener("click", () => {
-            window.location.href = "desktop.html";
         });
     </script>
 
