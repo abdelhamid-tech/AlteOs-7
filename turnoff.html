@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>AlteOs 7 — Turnoff Test</title>
+
+  <!-- Google Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root { --bg:#050814; --fg:#f5f5f5; --accent:linear-gradient(135deg,#4f8cff,#7b5cff); }
+    html,body { height:100%; margin:0; font-family:'Inter',sans-serif; background:var(--bg); color:var(--fg); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    .center { height:100vh; display:flex; align-items:center; justify-content:center; }
+    .btn {
+      padding:12px 22px; border-radius:999px; border:0; cursor:pointer;
+      background:var(--accent); color:#fff; font-weight:600; font-size:15px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.45);
+    }
+    #blackScreen {
+      width:100vw; height:100vh; background:#000; display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:18px; text-align:center; padding:20px; box-sizing:border-box;
+      transition:opacity .6s ease;
+    }
+    #pressKey { opacity:.95; transition:opacity .4s ease; }
+    #pressKey.hidden { opacity:0; pointer-events:none; }
+    .muted { opacity:.8; font-size:16px; }
+    .fallback {
+      margin-top:14px; font-size:13px; color:#cfcfcf;
+    }
+    .small-btn {
+      margin-top:12px; padding:8px 14px; border-radius:8px; border:0; cursor:pointer; background:#222; color:#fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="center" id="root">
+    <button class="btn" id="turnOffBtn">Éteindre AlteOs 7 (test)</button>
+  </div>
+
+  <script>
+    // DEBUG: affiche dans la console pour suivre l'exécution
+    console.log('[turnoff] script chargé');
+
+    // Redirection vers start.html (ou fallback si absent)
+    function goToStart() {
+      cleanupListeners();
+      console.log('[turnoff] tentative de redirection vers start.html');
+      // Test si start.html existe en faisant une requête HEAD (fetch)
+      fetch('start.html', { method: 'HEAD' })
+        .then(resp => {
+          if (resp.ok) {
+            console.log('[turnoff] start.html trouvé, redirection...');
+            window.location.href = 'start.html';
+          } else {
+            console.warn('[turnoff] start.html introuvable (status ' + resp.status + ')');
+            showFallback();
+          }
+        })
+        .catch(err => {
+          console.warn('[turnoff] erreur fetch start.html:', err);
+          showFallback();
+        });
+    }
+
+    function showFallback() {
+      const blackScreen = document.getElementById('blackScreen');
+      if (!blackScreen) return;
+      const fallbackHtml = `
+        <div>
+          <div class="muted">Impossible d'ouvrir start.html</div>
+          <div class="fallback">Vérifie que <strong>start.html</strong> est dans le même dossier ou clique sur le bouton pour simuler la suite.</div>
+          <button class="small-btn" id="simulateBtn">Simuler démarrage</button>
+        </div>
+      `;
+      blackScreen.innerHTML = fallbackHtml;
+      const btn = document.getElementById('simulateBtn');
+      if (btn) btn.addEventListener('click', () => {
+        console.log('[turnoff] simulation démarrage (bouton)');
+        alert('Simulation : redirection vers start.html (fichier absent).');
+      });
+    }
+
+    // Nettoyage des listeners
+    function cleanupListeners() {
+      window.removeEventListener('keydown', onAnyKey);
+      window.removeEventListener('click', onAnyClick);
+    }
+
+    // Handlers
+    function onAnyKey(e) {
+      // ignore touches modificateurs seules
+      if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+      console.log('[turnoff] touche détectée:', e.key);
+      goToStart();
+    }
+    function onAnyClick() {
+      console.log('[turnoff] clic détecté');
+      goToStart();
+    }
+
+    // Séquence d'extinction
+    function confirmTurnoff() {
+      console.log('[turnoff] confirmTurnoff appelé');
+      // Remplace le contenu par l'écran noir
+      document.documentElement.scrollTop = 0;
+      document.body.innerHTML = `
+        <div id="blackScreen" style="opacity:0">
+          <div id="bootInner">
+            <div class="muted" id="shutting">AlteOs 7 s'éteint...</div>
+          </div>
+        </div>
+      `;
+
+      const blackScreen = document.getElementById('blackScreen');
+      if (!blackScreen) {
+        console.error('[turnoff] blackScreen introuvable après remplacement du body');
+        return;
+      }
+
+      // Fade-in
+      requestAnimationFrame(() => { blackScreen.style.opacity = '1'; });
+
+      // Après 2s, afficher le message d'appui et activer les listeners
+      setTimeout(() => {
+        const bootInner = document.getElementById('bootInner');
+        if (!bootInner) return;
+        bootInner.innerHTML = `
+          <div id="pressKey">Appuyez sur n'importe quelle touche ou cliquez pour démarrer</div>
+        `;
+
+        // Ajout des listeners
+        window.addEventListener('keydown', onAnyKey);
+        window.addEventListener('click', onAnyClick);
+
+        // Disparition du message après 10s
+        setTimeout(() => {
+          const msg = document.getElementById('pressKey');
+          if (msg) {
+            msg.classList.add('hidden');
+            setTimeout(() => { if (msg && msg.parentNode) msg.parentNode.removeChild(msg); }, 500);
+            console.log('[turnoff] message pressKey masqué après 10s');
+          }
+        }, 10000);
+
+      }, 2000);
+    }
+
+    // Attache le bouton de test
+    document.getElementById('turnOffBtn').addEventListener('click', confirmTurnoff);
+
+    // Pour debug local sans serveur: si fetch HEAD échoue à cause de CORS/file://,
+    // la fonction showFallback sera appelée et tu auras un bouton pour simuler.
+  </script>
+</body>
+</html>
